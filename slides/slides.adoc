@@ -1,0 +1,551 @@
+= Rainbow, ponies and Equestria
+:idprefix:
+:stem: asciimath
+:backend: html
+:source-highlighter: pygments
+:pygments-css: style
+:revealjs_history: true
+:revealjs_theme: serif
+:imagesdir: images
+
+[data-background="images/My_Little_Pony_Theme_Song.png"]
+== {nbsp}
+
+== about me
+
+*Jarek Pałka*
+
+* Allegro.tech, doing stuff, back to coding, hell yeah!!!
+* JDD, 4Developers and one more conference (still under development) where I serve as a dictator for life
+* JVM, bytecode, parsers, graphs and other cool things (like ponies)
+* owner at Symentis trainings,
+* former chief architect, development manager, head of development, backend developer and performance guy
+
+== what am I doing here?
+
+this is second time in my speaking history when I am speaking about something I don't have in production +
+I feel bad about it, I am leaving my comfort zone, +
+forgive me all my sins +
+because I don't know what I am doing
+
+== my evenings since @rabbitonweb sent me an email about @chamberconf
+
+[data-background="images/anger-workplace-702x336.jpg", data-background-size=contain]
+== me coding Pony
+
+== then comes
+
+"the eureka moment"
+
+[data-background="images/4203189-yodatalksaboutfacepalm.jpg", data-background-size=contain]
+== {nbsp}
+
+== Introduction
+
+Philosophers in a pony land
+
+=== what is pony?
+
+is a programming language, +
+which compiles to native code, +
+written in C, +
+with a little bit of help of LLVM
+
+=== the promise
+
+open-source +
+object-oriented +
+actor model +
+capabilities-secure +
+high performance
+
+[data-background="images/3038215-slide-s-0-as-americans-get-fatter-crash-test-dummies-are-getting-fatter-too.jpg", style="background : white; opacity : 0.7;"]
+=== It is all about safety
+
+=== !
+type safe +
+memory safe (no nulls, no dangling pointers) +
+exception safe (no runtime exceptions) +
+data-race free (but without atomics and locks) +
+deadlock free (this one is easy, no locks!)
+
+[data-background="images/promise.jpg", style="background : white; opacity : 0.7;"]
+=== no one ever promised you so much
+
+=== how to start
+
+at the moment there is a package available +
+but its pretty old +
+real man do this +
+
+`apt-get install build-essential llvm-3.6-dev && git clone https://github.com/ponylang/ponyc && cd ponyc && make install`
+
+[data-background="images/logo-showmethecode.png"]
+=== !
+
+=== reference capability
+
+how does Pony give us all this safety?
+
+=== quick reminder
+
+remember that Pony is capabilities-secure?
+
+[data-background="images/AoU_Iron_Man_01.png", style="background : white; opacity : 0.7;"]
+=== the compiler
+
+
+=== what is capability
+
+A capability is an unforgeable token that +
+(a) designates an object and +
+(b) gives the program the authority to perform a specific set of actions on that object.
+
+===  capabilities explained
+
+[source, c]
+----
+int fd = open("/etc/passwd", O_RDWR);
+----
+
+`fd` holds not only information about type, +
+but also what actions you can perform on object, +
+
+object capabilities are like file permissions, but for objects
+they tell you what you can do with object
+
+=== capabilities
+
+every object holds a unforgeable tag, which is its capability +
+no pointer arithmetics +
+means objects can be only reached when created or passed as method calls arguments
+
+=== no global state
+
+[data-background="images/baby-610x250.jpg", style="background : white; opacity : 0.7;" ]
+=== oh, man this is hard
+
+=== !
+
+where would be Java, Hibernate and Spring +
+without `public static` ?
+
+=== !
+
+graphviz::object-cap.dot[]
+
+=== !
+
+graphviz::reference-cap.dot[]
+
+=== isolated, written iso
+
+This is for references to isolated data structures. If you have an iso variable then you know that there are no other variables that can access that data. So you can change it however you like and give it to another actor.
+
+=== !
+
+graphviz::iso-cap.dot[]
+
+
+[data-background="images/giphy.gif"]
+=== !
+
+=== !
+
+graphviz::iso-cap-consume.dot[]
+
+=== value, written val
+
+This is for references to immutable data structures. If you have a val variable then you know that no-one can change the data. So you can read it and share it with other actors.
+
+=== !
+
+graphviz::val-cap.dot[]
+
+
+=== reference, written ref
+
+This is for references to mutable data structures that are not isolated, in other words "normal" data. If you have a ref variable then you can read and write the data however you like and you can have multiple variables that can access the same data. But you can't share it with other actors.
+
+=== !
+
+graphviz::ref-cap.dot[]
+
+=== box
+
+This is for references to data that is read-only to you.
+That data might be immutable and shared with other actors or there may be other
+variables using it in your actor that can change the data.
+Either way the box variable can be used to safely read the data.
+
+=== !
+
+graphviz::box-cap.dot[]
+
+=== transition, written trn
+
+This is used for data structures that you want to write to and give out
+read-only (`box`) variables to.
+You can also convert the `trn` variable to a val variable later if you wish,
+which stops anyone from changing the data and allows it be shared with other actors.
+
+=== !
+
+graphviz::trn-cap.dot[]
+
+=== tag
+
+This is for references used only for identification. You cannot read or write data using a tag variable. But you can store and compare tags to check object identity and share tag variables with other actors.
+
+=== an example
+
+[source,pony]
+----
+use "collections"
+
+class AnObject
+  let arr : Array[U8] = Array[U8]
+  fun add(v : U8) =>
+    arr.push(v)
+----
+
+This won't compile
+
+=== receiver type is not a subtype of target type
+
+classes are by default `ref`, but methods are `box`
+
+[data-background="images/masthead-cdsguided-weapon-systems-msc-810x344copyright.jpg"]
+== Destructive reads, recovery and consumption
+
+=== sendable values
+
+before we dive in, we need to do a step back
+
+=== immutable is good
+
+=== bullshit!
+
+=== just think for a moment
+
+the world is globally immutable +
+but locally mutable +
+
+[data-background="images/confused.jpg"]
+=== WAT!?!
+
+=== !
+
+read about https://en.wikipedia.org/wiki/Arrow_of_time[arrow of time], +
+cyclic and linear processes, +
+entropy and all this nerdy stuff +
+or study thermodynamics
+
+=== no worries I have just made this up
+
+=== immutable is expensive
+
+that's a fact
+
+=== but mutable is hard
+
+unless you can isolate access to such data
+
+in Pony you can only pass `val` (immutable), +
+`tag` (opaque) +
+or `iso` (isolated) data +
+to actor
+
+=== working with isolated data
+
+how does Pony ensure there is only one reference (alias) to an object?
+
+you need to destroy the reference, either by consuming it or destructive read
+
+=== example
+
+[source, pony]
+----
+class Counter
+  var _value : I32 = 0
+  fun ref inc() =>
+    _value = _value+1
+  fun ref dec() =>
+    _value = _value-1
+  fun box counter() : I32 => _value
+
+actor Incrementer
+  be inc(c : Counter iso) => // pass sendable
+    c.inc()  // capabiltiies sub-typing
+    Decrementer.dec(consume c) //consume value
+
+actor Decrementer
+  be dec(c : Counter iso) => // pass sendable
+    c.dec()  // capabiltiies sub-typing
+    Incrementer.inc(consume c)
+
+actor Main
+  new create(env : Env) =>
+    var c = Counter
+    Incrementer.inc(consume c)
+----
+
+=== consume
+
+when you consume reference, you cannot use it anymore in the code
+
+[source, pony]
+----
+actor Incrementer
+  be inc(counter : Counter iso) => // pass sendable
+    counter.inc()  // capabiltiies sub-typing
+    Decrementer.dec(consume counter) //consume value
+    env.out.print(counter.counter()) // <1>
+----
+<1> this wont work, `counter` doesn't exist anymore
+
+=== ephemeral type
+
+remeber, everything is expression?
+
+[source, pony]
+----
+anActor.doStuff(consume data)
+----
+
+What is the type of `consume`? +
+it is `iso^`, so called ephemeral, in short +
+"shit I don't know what it is, I just consumed it, so it is whatever you like it to be"
+
+[data-background="images/3515844-6818749515-a2f3d.jpg",data-background-size=contain]
+=== {nbsp}
+
+=== ephemeral type
+
+it's a type for a value that currently has no name (it might have a name through some other alias, but not the one we just consumed or destructively read). +
+
+a constructor always returns an ephemeral type, because it's a new object
+
+=== destructive read
+
+in Pony everything is an expression +
+so what is return type of assignment ? +
+
+[source, pony]
+----
+var counter' = (counter = None)
+----
+
+it is the old value, it is called destructive read
+
+since you cannot consume fields +
+(I hope it is obvious at this point) +
+you can use destructive read to get isolated capability
+
+=== recovering capabilities
+
+[source, pony]
+----
+var arr =
+recover val // <1>
+  var array = Array[U8]
+  array.push(1)
+  array.push(2)
+  array.push(3)
+  array // <2>
+end
+----
+<1> this is how you "lift" `ref` to `val`
+<2> remember everything is an expression
+
+=== recovering capabilities
+
+let's you "lift" the reference capability of the result.
+A mutable reference capability (`iso`, `trn`, or `ref`) can become any reference capability,
+and an immutable reference capability (`val` or `box`) can become any immutable or
+opaque reference capability.
+
+=== capabilities sub-typing
+
+do I have to always use `recover` ? +
+actually not, because there is capabilities sub-typing +
+if you need to pass `iso` and you have `ref`, it is ok +
+if you need `box` and have `val` that's ok too +
+
+Sub-typing is transitive
+
+=== the things I missed
+
+ambient authority +
+ephemeral types +
+alias types +
+I just got a feel how it works, it is not enough to share with the crowd
+
+== Chapter IV
+
+Garbage collector and other internals
+
+
+=== ORCA
+
+Pony is garbage collected runtime, it uses it's own algorithm called ORCA, +
+and yes, it is reference counting garbage collector, +
+deferred, distributed, weighted, concurrent +
+WHAT?
+
+=== when garbage collection happens
+
+in short garbage collection happens when actor has finished processing of the message,
+and thanks to message passing it can defer reference counting +
+
+but it still leaves cyclic references a problem
+
+=== when actor is blocked
+
+so, when actor is garbage collected? +
+when there as no messages in mailbox (actor is blocked) +
+and all other actors which hold reference to it are also blocked
+
+=== mailboxes
+
+in Pony mailboxes are Lamport's queues +
+they use GCC extensions which adds atomic variables to ANSI C
+
+== Chapter
+
+== Chapter I
+
+Actors, objects and other types
+
+=== Good old classes
+
+[source,Pony]
+----
+class GoodOldClass
+  var env : Env
+  new create(env' : Env) =>
+    env = env' // <1>
+  fun helloworld(name : String) =>
+    env.out.print("Hello "+name)
+----
+<1> all fields need to be initialized in constructor
+
+=== Actors
+
+[source,pony]
+----
+actor AnActor
+  var env : Env
+  new create(env' : Env) =>
+    env = env'
+  be helloworld(name : String) => // <1>
+    env.out.print("Hello "+name)
+----
+<1> notice `be` in place of `fun` and no return type
+
+=== what is the difference?
+
+functions are synchronous and behaviors are asynchronous +
+each actor can do one behavior at a time +
+objects passed to actors need to be sendable +
+more about it later
+
+=== Polymorphism
+
+nominal and structural
+
+=== Traits
+
+nominal sub-typing
+
+[source,pony]
+----
+trait Named
+  fun name() : String => "Bob"
+
+class Bob is Named
+----
+
+=== Interfaces
+
+structural sub-typing
+
+[source, pony]
+----
+interface Name
+  fun name() : String
+
+class Bob
+  fun name() : String => "Bob"
+----
+
+=== Algebraic data types
+
+=== Union types
+
+[source,pony]
+----
+interface Eq
+  fun eq(object : Any) : Bool
+
+interface HashCode
+    fun hashCode() : I32
+
+type Entry is (Eq & HashCode) // <1>
+----
+<1> this is type alias
+
+=== Intersection types
+
+[source,pony]
+----
+primitive Error
+
+class Value
+  var value : String
+  var size : USize
+
+type Response is (Value | Error | None)
+----
+
+=== tuples and primitives
+
+[source, pony]
+----
+var tuple : (String, U32, Bool) = ("String",3,False)
+
+primitive Red
+  fun hexcode() : String => "#ff0000" // <1>
+primitive Green
+  fun hexcode() : String => "#00ff00"
+primitive Blue
+  fun hexcode() : String => "#0000ff"
+
+type RGB is (Red|Green|Blue) // <2>
+----
+<1> primitives can't have state, but can have functions
+<2> enumeration type
+
+=== objects literals
+
+[source, pony]
+----
+class Foo
+  fun foo(str: String): Hashable =>
+    object is Hashable
+      let s: String = str
+      fun apply(): String => s
+      fun hash(): U64 => s.hash()
+    end
+----
+
+=== THE LAMBDA
+
+something your all waiting for
+
+[source, pony]
+----
+lambda(s: String): String => "lambda: " + s end
+----
+
+=== that's all folks about types

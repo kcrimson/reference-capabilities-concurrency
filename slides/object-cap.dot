@@ -1,0 +1,11 @@
+digraph G {
+
+  size="5,8!"
+
+  object  [label="object : ref"]
+  write
+  read
+
+  write -> object
+  read -> object
+}

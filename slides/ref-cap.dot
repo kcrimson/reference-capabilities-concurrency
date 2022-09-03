@@ -1,0 +1,18 @@
+digraph {
+
+  size = "5,8!"
+
+  ref
+  read
+  write
+  a
+  b
+
+  read->ref
+  write->ref
+  b->read
+  b->write
+  a->read
+  a->write
+
+}

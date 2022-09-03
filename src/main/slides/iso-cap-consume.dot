@@ -1,0 +1,16 @@
+digraph {
+
+  size="5,8!"
+
+  iso
+  read
+  write
+  a
+  b
+
+  read->iso
+  write->iso
+  b->read
+  b->write
+
+}

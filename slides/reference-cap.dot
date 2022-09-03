@@ -1,0 +1,15 @@
+digraph G {
+
+  size="5,8!"
+
+  object  [label="object : ref"]
+  ref [label="var alias : ref"]
+  write
+  read
+
+  write -> object
+  read -> object
+
+  ref -> write
+  ref -> read
+}
