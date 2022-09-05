@@ -10,3 +10,9 @@
 .reveal blockquote {
   width : 90%;
 }
+
+.title h1 {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  font-size: xx-large;
+}

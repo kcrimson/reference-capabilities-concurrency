@@ -1,4 +1,4 @@
-= Rainbow, ponies and Equestria
+= Reference capabilities, type systems, and the path to concurrency
 :idprefix:
 :stem: asciimath
 :backend: html
@@ -7,97 +7,108 @@
 :revealjs_theme: serif
 :imagesdir: images
 :customcss: css/custom.css
-:title-slide-background-image: My_Little_Pony_Theme_Song.png
+:title-slide-background-image: https://www.publicdomainpictures.net/pictures/10000/velka/1-1230634165FAXt.jpg
 
 == about me
 
-*Jarek Pałka*
+Jarek Pałka (@j_palka)
 
-* Allegro.tech, doing stuff, back to coding, hell yeah!!!
-* JDD, 4Developers and one more conference (still under development) where I serve as a dictator for life
-* JVM, bytecode, parsers, graphs and other cool things (like ponies)
-* owner at Symentis trainings,
-* former chief architect, development manager, head of development, backend developer and performance guy
+Neo4j (a graph database) staff engineer/team lead/benchmarking team
+
+over 20 years with JVM ( and people) +
+speaker, coder, architect
+
+founder of SegFault (https://segfault.events) conference +
+godfather of Programistyczna Grupa Rozwoju +
+and proud father of new baby, **JVM Club** (working title) +
 
 == what am I doing here?
 
-this is second time in my speaking history when I am speaking about something I don't have in production +
+this is third time in my speaking history when I am speaking about something I don't have in production +
 I feel bad about it, I am leaving my comfort zone, +
 forgive me all my sins +
 because I don't know what I am doing
 
-== my evenings since @rabbitonweb sent me an email about @chamberconf
+== !
 
-== me coding Pony
+[quote,Herb Sutter,The Free Lunch Is Over]
+The major processor manufacturers and architectures, from Intel and AMD to Sparc and PowerPC, have run out of room with most of their traditional approaches to boosting CPU performance. Instead of driving clock speeds and straight-line instruction throughput ever higher, they are instead turning en masse to hyperthreading and multicore architectures.
 
-image::anger-workplace-702x336.jpg[background]
+=== !
 
-== then comes
+[quote,Herb Sutter,The Free Lunch Is Over]
+Both of these features are already available on chips today; in particular, multicore is available on current PowerPC and Sparc IV processors, and is coming in 2005 from Intel and AMD. Indeed, the big theme of the 2004 In-Stat/MDR Fall Processor Forum was multicore devices, as many companies showed new or updated multicore processors. Looking back, it’s not much of a stretch to call 2004 the year of multicore.
 
-"the eureka moment"
+=== !
 
-== {nbsp}
+[quote,Herb Sutter,The Free Lunch Is Over]
+No matter how fast processors get, software consistently finds new ways to eat up the extra speed. Make a CPU ten times as fast, and software will usually find ten times as much to do (or, in some cases, will feel at liberty to do it ten times less efficiently). 
+
+
+=== !
+
+[quote,Herb Sutter,The Free Lunch Is Over]
+Most classes of applications have enjoyed free and regular performance gains for several decades, even without releasing new versions or doing anything special, because the CPU manufacturers (primarily) and memory and disk manufacturers (secondarily) have reliably enabled ever-newer and ever-faster mainstream systems. 
+
+
+=== !
+
+[quote,Herb Sutter,The Free Lunch Is Over]
+Clock speed isn’t the only measure of performance, or even necessarily a good one, but it’s an instructive one: We’re used to seeing 500MHz CPUs give way to 1GHz CPUs give way to 2GHz CPUs, and so on. Today we’re in the 3GHz range on mainstream computers.
+
+=== !
+
+[quote,Herb Sutter,The Free Lunch Is Over]
+Starting today, the performance lunch isn’t free any more. Sure, there will continue to be generally applicable performance gains that everyone can pick up, thanks mainly to cache size improvements. But if you want your application to benefit from the continued exponential throughput advances in new processors, it will need to be a well-written concurrent (usually multithreaded) application. 
+
+=== !
+
+[quote,Herb Sutter,The Free Lunch Is Over]
+And that’s easier said than done, because not all problems are inherently parallelizable and because concurrent programming is hard.
+I can hear the howls of protest: “Concurrency? That’s not news! People are already writing concurrent applications.” That’s true. Of a small fraction of developers.
+
+== Concurrency is the next major revolution in how we write software
+
+=== 20 years later
+
+the problem is so hard that we are trying to not be bothered by it :)
+
+and let virtual machines, frameworks and compilers do this job for us
+
+=== seven concurrency styles
+
+* Threads and Locks 
+* Functional Programming
+* Software Transactional Memory
+* Actors
+* Data Parallelism
+* Lambda Architecture
+* Tuple Spaces
+
+=== if this is hard, stop doing it
+
+image::anger-workplace-702x336.jpg[background,size=contain]
+
+=== !
+
+image::https://www.codurance.com/hubfs/Imported_Blog_Media/the_synchronisation_quadrant-1.png[background,size=contain]
+
+=== !
+
+we could stop sharing mutable structures +
+(for the price of memory usage)
+
+=== !
+
+what if there was a way to prove that shared mutable structure +
+is modified at any given point in time +
+only by one thread?
+ 
+=== !
 
 image::4203189-yodatalksaboutfacepalm.jpg[background,size=contain]
 
-== Introduction
-
-Philosophers in a pony land
-
-=== what is pony?
-
-is a programming language, +
-which compiles to native code, +
-written in C, +
-with a little bit of help of LLVM
-
-=== the promise
-
-open-source +
-object-oriented +
-actor model +
-capabilities-secure +
-high performance
-
-=== It is all about safety
-
-image::3038215-slide-s-0-as-americans-get-fatter-crash-test-dummies-are-getting-fatter-too.jpg[background]
-
-=== !
-type safe +
-memory safe (no nulls, no dangling pointers) +
-exception safe (no runtime exceptions) +
-data-race free (but without atomics and locks) +
-deadlock free (this one is easy, no locks!)
-
-=== no one ever promised you so much
-
-image::promise.jpg[background]
-
-=== how to start
-
-at the moment there is a package available +
-but its pretty old +
-real man do this +
-
-`apt-get install build-essential llvm-3.6-dev && git clone https://github.com/ponylang/ponyc && cd ponyc && make install`
-
-=== !
-
-image::logo-showmethecode.png[background]
-
-
-=== reference capability
-
-how does Pony give us all this safety?
-
-=== quick reminder
-
-remember that Pony is capabilities-secure?
-
-=== the compiler
-
-image::AoU_Iron_Man_01.png[background]
+== reference & object capabilities model
 
 === what is capability
 
@@ -120,28 +131,389 @@ they tell you what you can do with object
 
 === capabilities
 
-every object holds a unforgeable tag, which is its capability +
+every object holds a unforgeable tag, which is its capability
+
 no pointer arithmetics +
-means objects can be only reached when created or passed as method calls arguments
+It means objects can be only reached when created or passed as method calls arguments
 
-=== no global state
+no global state +
+They’re bad! Because you can get them without either constructing them or being passed them
 
+[role="highlight_section_title"]
 === oh, man this is hard
 
-image::baby-610x250.jpg[background]
+image::baby-610x250.jpg[background,size=contain]
+
+=== how it is done?
+
+using type qualifiers ;) and crazy compiler mechanics
+
+=== !
+
+[source,c]
+----
+#include <stdio.h>
+int main(void)
+{
+	int i = 10;
+	int j = 20;
+	/* ptr is pointer to constant */
+	const int *ptr = &i;
+
+	printf("ptr: %d\n", *ptr);
+	/* error: object pointed cannot be modified
+	using the pointer ptr */
+	*ptr = 100;
+
+	ptr = &j;		 /* valid */
+	printf("ptr: %d\n", *ptr);
+
+	return 0;
+}
+----
+
+=== capabilities for dummies 
+
+think about capabilities as `const` or Java `final` +
+on steroids, amphetamine or DMT
+
+[role="highlight_section_title"]
+=== Pony
+
+image::My_Little_Pony_Theme_Song.png[background,size=contain]
+
+=== what is pony?
+
+is a programming language, +
+which compiles to native code, +
+written in C, +
+with a little bit of help of LLVM
+
+=== the promise
+
+open-source +
+object-oriented +
+actor model +
+capabilities-secure +
+high performance
+
+[role="highlight_section_title"]
+=== It is all about safety
+
+image::3038215-slide-s-0-as-americans-get-fatter-crash-test-dummies-are-getting-fatter-too.jpg[background]
+
+=== !
+
+type safe +
+memory safe (no nulls, no dangling pointers) +
+exception safe (no runtime exceptions) +
+data-race free (but without atomics and locks) +
+deadlock free (this one is easy, no locks!)
+
+[role="highlight_section_title"]
+=== no one ever promised you so much
+
+image::promise.jpg[background]
+
+=== an example
+
+[source,pony]
+----
+use "collections"
+
+class AnObject
+  let array : Array[U8] = Array[U8]
+  fun add(v : U8) =>
+    array.push(v)
+
+actor Main
+    new create(env : Env) =>
+        let anObject = AnObject
+        anObject.add(1)
+----
+
+This won't compile
+
+=== !
+
+[quote,,Pony Tutorial]
+  In Pony, every use of a type has a reference capability. These capabilities apply to variables, rather than to the type as a whole. In other words, when you define a class Wombat, you don’t pick a reference capability for all instances of the class. Instead, Wombat variables each have their own reference capability.
+
+=== !
+
+[quote,,Pony Tutorial]
+  As an example, in some languages, you have to define a type that represents a mutable String and another type that represents an immutable String. For example, in Java, there is a String and a StringBuilder. In Pony, you can define a single class String and have some variables that are String ref (which are mutable) and other variables that are String val (which are immutable).
+
+=== why it didn't work?
+
+let's get back to basics of capabilities
+
+[graphviz]
+----
+digraph{
+  rankdir = LR
+  Subject -> Invocation [label=Authority]
+  Invocation -> Resource
+}
+----
+
+=== !
+
+[source,pony]
+----
+use "collections"
+
+class AnObject
+  let array : Array[U8] = Array[U8]
+  fun add(v : U8) =>
+    array.push(v)
+----
+
+=== !
+
+[graphviz]
+----
+digraph{
+  rankdir = LR
+  AnObject -> push [label="?"]
+  push -> array
+}
+----
+
+=== !
+
+what is the authority in this case?
+
+[quote,,Pony Tutorial]
+  *box* This is for references to data that is read-only to you. That data might be immutable and shared with other actors or there may be other variables using it in your actor that can change the data. Either way, the box variable can be used to safely read the data. This may sound a little pointless, but it allows you to write code that can work for both val and ref variables, as long as it doesn’t write to the object.
+
+=== !
+
+it will become more clear when we will discuss capabilities subtyping
+
+but for now let's remember box is default capability of methods in classes
+
+=== !
+
+[graphviz]
+----
+digraph{
+  rankdir = LR
+  AnObject -> push [label="box"]
+  push -> array
+}
+----
+
+=== !
+
+Let's have a look at Array class
+
+[source,pony]
+----
+class Array[A] is Seq[A]
+  fun ref push(value: A) =>
+    """
+    Add an element to the end of the array.
+    """
+    reserve(_size + 1)
+    _ptr._update(_size, consume value)
+    _size = _size + 1
+----
+
+=== !
+
+This method expects ref capability
+
+[quote,,Pony Tutorial]
+Reference, written ref. This is for references to mutable data structures that are not isolated, in other words, “normal” data. If you have a ref variable then you can read and write the data however you like and you can have multiple variables that can access the same data. But you can’t share it with other actors.
+
+=== !
+
+++++
+Error: 
+
+  example0.pony:6:13: receiver type is not a subtype of target type +
+    arr.push(v)
+            ^
+
+Info: +
+    example0.pony:6:5: receiver type: this->Array[U8 val] ref (which becomes 'Array[U8 val] box' in this context) +
+        arr.push(v)
+        ^
+
+    builtin/array.pony:623:3: target type: Array[U8 val] ref^ +
+      fun ref push(value: A) =>
+      ^
+
+    example0.pony:4:13: Array[U8 val] box is not a subtype of Array[U8 val] ref^: box is not a subcap of ref^ +
+      let arr : Array[U8] = Array[U8]
+                ^
+
+    example0.pony:5:3: you are trying to change state in a box function; this would be possible in a ref function +
+      fun add(v : U8) =>
+      ^
+++++ 
+
+=== !
+
+so we now know about two capabilities types _box_ and _ref_, 
+let's fix our example
+
+[source,pony]
+----
+use "collections"
+
+class AnObject
+  let array : Array[U8] = Array[U8]
+  fun ref add(v : U8) =>
+    array.push(v)
+----
+
+=== !
+
+of course there must be third capability called _val_
+
+[quote,,Pony Tutorial]
+Value, written val. This is for references to immutable data structures. If you have a val variable then you know that no-one can change the data. So you can read it and share it with other actors.
+
+=== !
+
+image::https://media.giphy.com/media/CLrEXbY34xfPi/giphy.gif[background,size=contain]
+
+=== !
+
+this is where things get interesting
+
+== actors and isolated data structures
+
+
+=== !
+
+[quote,,Pony Tutorial]
+Isolated, written iso. This is for references to isolated data structures. If you have an iso variable then you know that there are no other variables that can access that data. So you can change it however you like and give it to another actor.
+
+=== !
+
+[source,pony]
+----
+use "time"
+
+class Timeseries
+  let arr : Array[I64] = Array[I64]
+  fun ref add(v : I64) =>
+    arr.push(v)
+  fun last()? =>
+    arr(arr.size()-1)?
+
+actor PrintLastValue
+  let env : Env
+  new create(env' : Env) =>
+    env = env'
+  be print_and_inc( timeseries : Timeseries iso) =>
+    let message = try
+      timeseries.last()?.string()
+    else
+      "Timeseries is empty"
+    end
+    (let seconds, let nanos) = Time.now()
+    timeseries.add(seconds)
+    env.out.print(message)
+
+actor Main
+    new create(env : Env) =>
+        let actr = PrintLastValue(env)
+        let timeseries = Timeseries
+        (let seconds, let nanos) = Time.now()
+        timeseries.add(seconds)
+        actr.print_and_inc(timeseries) <1>
+----
+<1> compiler will fail, this is not allowed
+
+=== but mom, why?
+
+by default, all objects have _ref_ capability, 
+unless it is changed in class declaration
+
+[source,pony]
+----
+class A val
+----
+
+=== !
+
+it doesn't mean all instances will have _val_ capability,+
+only if we call default constructor
+
+[source,pony]
+----
+class A val
+  
+  new immutable() =>
+
+  new ref mutable() =>
+
+----
+
+=== but mom, why?
+
+in Pony actors can only accept _sendable types_, +
+aka types that are safe to share with others +
+_val_,_iso_, _tag_ (yeap, new kid on the block)
+
+=== !
+
+[quote,,Pony Tutorial]
+Tag. This is for references used only for identification. You cannot read or write data using a tag variable. But you can store and compare tags to check object identity and share tag variables with other actors.
+
+=== !
+
+but how we can make _ref_ an _iso_ ?
+
+[role="highlight_section_title"]
+=== Consume and Destructive Read
+
+image::masthead-cdsguided-weapon-systems-msc-810x344copyright.jpg[background]
+
+=== !
+
+[quote,,Pony Tutorial]
+An important part of Pony’s capabilities is being able to say “I’m done with this thing.” We’ll cover two means of handling this situation: consuming a variable and destructive reads.
+
+== Introduction
+
+Philosophers in a pony land
+
+
+=== how to start
+
+at the moment there is a package available +
+but its pretty old +
+real man do this +
+
+`apt-get install build-essential llvm-3.6-dev && git clone https://github.com/ponylang/ponyc && cd ponyc && make install`
+
+=== !
+
+image::logo-showmethecode.png[background]
+
+=== reference capability
+
+how does Pony give us all this safety?
+
+=== quick reminder
+
+remember that Pony is capabilities-secure?
+
+=== the compiler
+
+image::AoU_Iron_Man_01.png[background]
+
 
 === !
 
 where would be Java, Hibernate and Spring +
 without `public static` ?
 
-=== !
-
-graphviz::src/main/slides/object-cap.dot[]
-
-=== !
-
-graphviz::src/main/slides/reference-cap.dot[]
 
 === isolated, written iso
 
